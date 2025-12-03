@@ -1,0 +1,13 @@
+# vim: set filetype=zsh :
+
+local selected
+
+selected=$(rg --color=always --hidden --no-messages "$1" 2> /dev/null \
+    | fzf --ansi)
+
+# Extract the filename using awk
+local filename=$(echo "$selected" | awk -F: '{print $1}')
+
+if [ -n "$filename" ]; then
+    bat --style=header,grid "$filename"
+fi

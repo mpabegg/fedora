@@ -1,0 +1,14 @@
+# vim: set filetype=zsh :
+
+# Quickly change to frequently used directories
+
+local -A aliases
+aliases=(
+  d    "$MYPROJECTSDIR"
+  df   "$MYDOTDIR"
+  t    "$MYPROJECTSDIR"/tempo
+  tempo    "$MYPROJECTSDIR"/tempo
+)
+
+cd ${aliases[${1:-d}]}
+pwd

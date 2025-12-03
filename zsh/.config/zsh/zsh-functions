@@ -1,0 +1,58 @@
+# vim: set filetype=zsh :
+
+# I'm taking this fom the excelent https://github.com/Mach-OS/Machfiles/blob/master/zsh/.config/zsh/zsh-functions
+ZSH_PLUGIN_HOME="$XDG_DATA_HOME/zsh/plugins"
+
+# Sources a file if it exists
+function zsh_add_file() {
+  [ -f "$ZDOTDIR/$1" ] && source "$ZDOTDIR/$1"
+}
+
+function zsh_add_dir() {
+  for file in $ZDOTDIR/$1/*.zsh; do
+    source $file
+  done;
+}
+
+function zsh_add_bin() {
+  export PATH="$ZDOTDIR/$1/bin:$PATH"
+}
+
+function zsh_add_plugin() {
+  local PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
+  PLUGIN_PATH="$ZSH_PLUGIN_HOME/$PLUGIN_NAME"
+
+  if [ ! -d "$PLUGIN_PATH" ]; then
+    git clone  "https://github.com/$1.git" "$PLUGIN_PATH"
+  fi
+
+  if [ -d "$PLUGIN_PATH" ]; then
+    for file in "$PLUGIN_NAME.plugin" "$PLUGIN_NAME" "init"; do
+      [ -f "$PLUGIN_PATH/$file.zsh" ] && source "$PLUGIN_PATH/$file.zsh" && break;
+    done
+  fi
+}
+
+function zsh_add_completions() {
+  local PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
+  PLUGIN_PATH="$ZSH_PLUGIN_HOME/$PLUGIN_NAME"
+
+  if [ ! -d "$PLUGIN_PATH" ]; then
+    git clone  "https://github.com/$1.git" "$PLUGIN_PATH"
+    [ -f $ZDOTDIR/.zccompdump ] && $ZDOTDIR/.zccompdump
+  fi
+
+  if [ -d "$PLUGIN_PATH" ]; then
+    completion_file_path=$(ls $PLUGIN_PATH/_*)
+    fpath+="$(dirname "${completion_file_path}")"
+  fi
+
+  completion_file="$(basename "${copmletion_file_path}")"
+  [ "$2" = true ] && compinit "${completion_file:1}"
+}
+
+function zsh_init_plugins() {
+  if [ ! -d "$ZSH_PLUGIN_HOME" ]; then
+    mkdir -p "$ZSH_PLUGIN_HOME"
+  fi
+}
